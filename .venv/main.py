@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from pydantic import BaseModel
 from datetime import datetime
 from random import randint
+
 
 id_length = 6
 
@@ -24,13 +25,13 @@ database = {"id": "BaseModel" # ['login', 'password', 'second_name', 'first_name
 app = FastAPI() # uvicorn main:app --reload
 
 @app.get("/")
-def hihihaha(test: str):
-    return f"Main page: {test}"
+def hihihaha(data=Body()):
+    return f"Main page: {data}"
 
 @app.get("/profile/{id}")
-def read_profile(id: int, password: str, login: str):
+def read_profile(id: int, data=Body()):
     if id in database:
-        if password == database[id].password and login == database[id].login:
+        if data["password"] == database[id].password and data["login"] == database[id].login:
             birthdate = database[id].DoB
             age = datetime.now().year - birthdate.year - ((datetime.now().month, datetime.now().day) < (birthdate.month, birthdate.day))
             return (database[id].model_dump(), f'Возраст = {age}')
@@ -40,8 +41,8 @@ def read_profile(id: int, password: str, login: str):
         return "Такого профиля не существует"
 
 @app.post("/profile")
-def registration(password: str, login: str):
-    profile = Model(password=password, login=login)
+def registration(data=Body()):
+    profile = Model(password=data["password"], login=data["login"])
     while True:
         id = int(''.join([str(randint(0, 9)) for _ in range(id_length)])) # id = случайное {id_length}-значное число
         if id not in database: # и проверяется наличие идентичного id в database
