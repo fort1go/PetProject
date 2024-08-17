@@ -48,3 +48,13 @@ def registration(data=Body()):
 
     database[id] = profile
     return {f"Аккаунт создан;  id = {id}; {profile.model_dump()}"}
+
+@app.patch('/profile/{id}')
+def patch_profile(id: int, data=Body()):
+    if id in database:
+        profile = database[id]
+        database[id] = profile.model_copy(update=data)
+        return 'Профиль был изменён'
+    else:
+        return "Такого профиля не существует"
+
