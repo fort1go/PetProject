@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Body
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from datetime import datetime
 from random import randint
 
