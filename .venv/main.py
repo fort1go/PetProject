@@ -16,6 +16,13 @@ class Model(BaseModel):
     DoB: datetime = None # datetime(2020,1,1)
     Expirience: float = None # 0
 
+    # @validator("DoB")
+    # @classmethod
+    # def validate_date_of_birth(cls, v):
+    #     if v and v >= datetime.today():
+    #         return 'Дата рождения должна быть в прошлом'
+    #     return v
+
 
 database = {"id": "BaseModel" # ['login', 'password', 'second_name', 'first_name', 'surname', 'DoB', 'Experience']
              }
@@ -30,6 +37,7 @@ def hihihaha(data=Body()):
 
 @app.get("/profile/{id}")
 def read_profile(id: int):
+    print(database)
     if id in database:
         if (birthdate := database[id].DoB) != None:
             age = datetime.now().year - birthdate.year - (
@@ -58,3 +66,19 @@ def patch_profile(id: int, data=Body()):
     else:
         return "Такого профиля не существует"
 
+@app.put('/profile/{id}')
+def patch_profile(id: int, data=Body()):
+    if id in database:
+        if 'password' in data and 'login' in data:
+            database[id] = Model(**data)
+            return f'Профиль был изменён'
+    else:
+        return "Такого профиля не существует"
+
+@app.delete('/profile/{id}')
+def patch_profile(id: int, data=Body()):
+    if id in database:
+        del database[id]
+        return "Профиль был удалён"
+    else:
+        return "Такого профиля не существует"
