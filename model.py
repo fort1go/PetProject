@@ -1,7 +1,9 @@
 from pydantic import BaseModel, validator
+from datetime import datetime
 
 
 class Model(BaseModel):
+    id: int
     login: str
     password: str
     second_name: str = None # 'second_name'
