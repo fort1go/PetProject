@@ -15,50 +15,54 @@ def read_profile(user_id: int):
     if len(database):
         for user in database:
             if user.id == user_id:
-                if (birthdate := user.DoB) != None:
-                    age = datetime.now().year - birthdate.year - (
-                            (datetime.now().month, datetime.now().day) < (birthdate.month, birthdate.day))
-                    return {**dict(user), 'age': age}
-                return {**dict(user), 'age': "null"}
+                if (birthdate := user.DoB) != None and user.age != None:
+                    user.__dict__.update(age=datetime.now().year - birthdate.year - (
+                            (datetime.now().month, datetime.now().day) < (birthdate.month, birthdate.day)))
+                return user
             else:
                 raise HTTPException(status_code=404, detail="User not found")
     else:
         raise HTTPException(status_code=404, detail="User not found")
 
 @app.post("/profile")
-def registration(data=Body()):
+def registration(data: Model = Body()):
     while True:
         user_id = int(''.join([str(randint(0, 9)) for _ in range(user_id_length)]))  # user_id = случайное {user_id_length}-значное число
         for user in database:
             if user.id == user_id:
                 break
         break
-    profile = Model(**data, id=user_id)
+    data.__dict__.update(id=user_id)
+    profile = data
     database.append(profile)
     return profile
 
 
 @app.patch('/profile/{user_id}')
-def patch_profile(user_id: int, data=Body()):
+def patch_profile(user_id: int, data: Model=Body()):
     for i, user in enumerate(database):
         if user.id == user_id:
-            database[i].__dict__.update(**data)
+            database[i] = data.model_copy()
             return database[i]
         else:
             raise HTTPException(status_code=404, detail="User not found")
 
 
 @app.put('/profile/{user_id}')
-def put_profile(user_id: int, data=Body()):
-    for i, user in enumerate(database):
+def put_profile(user_id: int, data: Model = Body()):
+    for user in database:
+        print(user.id == user_id)
         if user.id == user_id:
-            if 'password' in data and 'login' in data:
+            if 'password' in dict(data) and 'login' in dict(data):
                 database.remove(user)
-                database.append(Model(id=user.id, **data))
-                return database[i]
+                profile = data
+                data.__dict__.update(id=user_id)
+                database.append(profile)
+                return database[-1]
+            else:
+                raise HTTPException(status_code=404, detail="Password or Login not found")
         else:
             raise HTTPException(status_code=404, detail="User not found")
-
 
 @app.delete('/profile/{user_id}')
 def delete_profile(user_id: int):
