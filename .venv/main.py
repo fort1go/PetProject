@@ -1,27 +1,9 @@
 from fastapi import FastAPI, Body
-from pydantic import BaseModel
 from datetime import datetime
 from random import randint
 
 
 id_length = 6
-
-
-class Model(BaseModel):
-    login: str
-    password: str
-    second_name: str = None # 'second_name'
-    first_name: str = None # 'first_name'
-    surname: str = None # 'surname'
-    DoB: datetime = None # datetime(2020,1,1)
-    Expirience: float = None # 0
-
-    # @validator("DoB")
-    # @classmethod
-    # def validate_date_of_birth(cls, v):
-    #     if v and v >= datetime.today():
-    #         return 'Дата рождения должна быть в прошлом'
-    #     return v
 
 
 database = {"id": "BaseModel" # ['login', 'password', 'second_name', 'first_name', 'surname', 'DoB', 'Experience']
