@@ -1,9 +1,10 @@
 from pydantic import BaseModel, validator
 from datetime import datetime
+from uuid import uuid4
 
 
 class Model(BaseModel):
-    id: int = 0
+    id: str = str(uuid4())
     login: str
     password: str
     second_name: str = None # 'second_name'
